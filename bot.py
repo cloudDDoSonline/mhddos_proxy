@@ -10,7 +10,7 @@ if sys.argv[1] == '-token' and len(sys.argv) > 2:
         token = config_lines[0].replace('\n', '')
         user_id = int(config_lines[1].replace('\n', ''))
 else:
-    raise "Invalid token\nExample: python3 main.py -token 'your_token_file\nOr enter your token to config.txt'"
+    raise "Invalid token\nExample: python3 bot.py -token 'your_token_file\nOr enter your token to config.txt'"
 
 bot = telebot.TeleBot(token)
 
