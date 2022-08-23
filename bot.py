@@ -1,42 +1,46 @@
 from subprocess import check_output
-import telebot
-from telebot import types #Добавляем импорт кнопок
-import time
+import telebot, time
+import sys
+from telebot import types
+token = ''
+user_id = 0
+if sys.argv[1] == '-token' and len(sys.argv) > 2:
+    with open(sys.argv[2]) as token_file:
+        config_lines = token_file.readlines()
+        token = config_lines[0].replace('\n', '')
+        user_id = int(config_lines[1].replace('\n', ''))
+else:
+    raise "Invalid token\nExample: python3 main.py -token 'your_token_file\nOr enter your token to config.txt'"
 
-bot = telebot.TeleBot("5514596781:AAEX7vvmAlQ5_Fnc76_Od0A3O-JD1rywj0Q")  # Токен бота
-user_id = 5301938332  # id вашего аккаунта
+bot = telebot.TeleBot(token)
 
-
-@bot.message_handler(content_types=["text"])
+@bot.message_handler(content_types=['text'])
 def main(message):
-    if (user_id == message.chat.id):  # проверяем, что пишет именно владелец
-        comand = message.text  # текст сообщения
-        markup = types.InlineKeyboardMarkup()  # создаем клавиатуру
-        button = types.InlineKeyboardButton(text="Повторить", callback_data=comand)  # создаем кнопку
-        markup.add(button)  # добавляем кнопку в клавиатуру
-        try:  # если команда невыполняемая - check_output выдаст exception
-            bot.send_message(user_id, check_output(comand, shell=True, reply_markup=markup))  # вызываем команду и отправляем сообщение с результатом
+    if user_id == message.chat.id:
+        command = message.text
+        markup = types.InlineKeyboardMarkup()
+        button = types.InlineKeyboardButton(text="Повторить", callback_data=command)
+        markup.add(button)
+        try:
+            bot.send_message(message.chat.id, check_output(command, shell=True))
         except:
-            bot.send_message(user_id, "Invalid input")  # если команда некорректна
-
+            bot.send_message(message.chat.id, 'Invalid input')
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback(call):
-    comand = call.data  # считываем команду из поля кнопки data
-    try:  # если команда не выполняемая - check_output выдаст exception
-        markup = types.InlineKeyboardMarkup()  # создаем клавиатуру
-        button = types.InlineKeyboardButton(text="Повторить",
-                                            callback_data=comand)  # создаем кнопку и в data передаём команду
-        markup.add(button)  # добавляем кнопку в клавиатуру
-        bot.send_message(user_id, check_output(comand, shell=True),
-                         reply_markup=markup)  # вызываем команду и отправляем сообщение с результатом
+    command = call.data 
+    try:
+        markup = types.InlineKeyboardMarkup() 
+        button = types.InlineKeyboardButton(text="Повторить", callback_data=command) 
+        markup.add(button)
+        bot.send_message(user_id, check_output(command, shell = True), reply_markup = markup)
     except:
-        bot.send_message(user_id, "Invalid input")  # если команда некорректна
+        bot.send_message(user_id, "Invalid input") 
 
 
 if __name__ == '__main__':
     while True:
-        try:  # добавляем try для бесперебойной работы
-            bot.polling(none_stop=True)  # запуск бота
+        try:
+            bot.polling(none_stop=True)
         except:
-            time.sleep(10)  # в случае падения
+            time.sleep(10)
