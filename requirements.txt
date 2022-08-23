@@ -11,7 +11,7 @@ pyopenssl==22.0.0
 cryptography>=37.0
 psutil>=5.9.0
 jinja2>=3.1.2
-certifi==2021.5.30
+certifi==2021.10.8
 charset-normalizer==2.0.4
 idna==3.2
 pyTelegramBotAPI==3.8.2
